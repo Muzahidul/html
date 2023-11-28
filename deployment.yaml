@@ -1,0 +1,108 @@
+# apiVersion: apps/v1
+# kind: Deployment
+# metadata:
+#   name: mytalkinghtml-nginx-deployment
+#   labels:
+#     app: mytalkinghtml
+# spec:
+#   replicas: 3
+#   selector:
+#     matchLabels:
+#       app: mytalkinghtml
+#   template:
+#     metadata:
+#       labels:
+#         app: mytalkinghtml
+#     spec:
+#       containers:
+#       - name: mytalkinghtml
+#         image: muzahidul/mytalkinghtml:latest
+#         ports:
+#         - containerPort: 880
+#         resources:
+#           limits:
+#             memory: 512Mi
+#             cpu: "1"
+#           requests:
+#             memory: 256Mi
+#             cpu: "0.2"
+
+kind: Service
+apiVersion: v1
+metadata:
+  name: mytalkinghtmlservice
+spec:
+  selector:
+    app: mytalkinghtml
+  ports:
+    - protocol: "TCP"
+      # Port accessible inside cluster
+      port: 8081
+      # Port to forward to inside the pod
+      targetPort: 80
+      # Port accessible outside cluster
+      nodePort: 30002
+  type: LoadBalancer
+ 
+ 
+ 
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: mytalkinghtml-nginx-deployment
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: mytalkinghtml
+  template:
+    metadata:
+      labels:
+        app: mytalkinghtml
+    spec:
+      containers:
+        - name: mytalkinghtml
+          image: muzahidul/mytalkinghtml:latest
+          ports:
+            - containerPort: 80
+          resources:
+            limits:
+              memory: 120Mi
+              cpu: "20"
+            requests:
+              memory: 60Mi
+              cpu: "0.5"
+
+# ...
+# apiVersion: autoscaling/v1
+# kind: HorizontalPodAutoscaler
+# metadata:
+#   name: mytalkinghtml-cpu
+# spec:
+#   maxReplicas: 10 # maximum replicas of pods
+#   minReplicas: 1
+#   scaleTargetRef:
+#     apiVersion: extensions/v1v1beta1
+#     kind: Deployment
+#     name: mytalkinghtml-nginx-deployment # TARGET name of the deployment the autoscaler need to be run on
+#   targetCPUUtilizationPercentage: 50 # CPU maximum amount of use on the pod is set to 30%.
+
+# ...
+# apiVersion: autoscaling/v2beta1
+# kind: HorizontalPodAutoscaler
+# metadata:
+#   name: mytalkinghtml-memory
+# spec:
+#   maxReplicas: 10
+#   minReplicas: 1
+#   scaleTargetRef:
+#     apiVersion: extensions/v1beta1
+#     kind: Deployment
+#     name: mytalkinghtml-nginx-deployment
+#   metrics:
+#   - type: Resource
+#     resource:
+#       name: memory
+#       targetAverageUtilization: 200
+#   targetAverageUtilization: 100

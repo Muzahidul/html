@@ -1,0 +1,78 @@
+<meta name="viewport" content="width=device-width, initial-scale=1, minimum-scale=1" />
+<title>CSS Grid Template 10</title>
+<style>
+body { 
+  display: grid;
+  grid-template-areas: 
+    "header header header"
+    "nav article article"
+    "nav footer footer";
+  grid-template-rows: 80px 1fr 70px;  
+  grid-template-columns: 20% 1fr 15%;
+  grid-row-gap: 10px;
+  grid-column-gap: 10px;
+  height: 100vh;
+  margin: 0;
+  }  
+header, footer, article, nav, div {
+  padding: 1.2em;
+  background: #eee;
+  }
+#pageHeader {
+  grid-area: header;
+  }
+#pageFooter {
+  grid-area: footer;
+  }
+#mainArticle { 
+  grid-area: article;      
+  }
+#mainNav { 
+  grid-area: nav; 
+  }
+
+/* Stack the layout on small devices/viewports. */
+@media all and (max-width: 575px) {
+  body { 
+    grid-template-areas: 
+      "header"
+      "article"
+      "nav"
+      "footer";
+    grid-template-rows: 80px 1fr 70px 1fr 70px;  
+    grid-template-columns: 1fr;
+ }
+}
+</style>
+<body>
+	<header id="pageHeader">Header</header>
+	<article id="mainArticle">
+		<label style="width: 100%; clear: both;">Write your text below:</label>
+		<textarea style="width: 100%; height: 100px;" id="textInput" onchange="updateText(this.value)"></textarea>
+		<div id="text">Hello World - This is default html</div>
+		<input type="button" onclick="speak()" value="Speak" />
+	</article>
+	<nav id="mainNav">Nav</nav>
+	<footer id="pageFooter">Footer</footer>
+</body>
+
+<script>
+	var msg = new SpeechSynthesisUtterance();
+	var voices = window.speechSynthesis.getVoices();
+	msg.voice = voices[8]; 
+	msg.volume = 1; // From 0 to 1
+	msg.rate = 1; // From 0.1 to 10
+	msg.pitch = 2; // From 0 to 2
+	//msg.text = "Como estas Joel";
+	//msg.lang = 'es';
+
+	function speak() {
+		var text = document.getElementById('text').innerText;
+		msg.text = text;
+		window.speechSynthesis.speak(msg);
+	}
+	
+	function updateText(value) {
+		document.getElementById('text').innerText = value;
+	}
+</script>
